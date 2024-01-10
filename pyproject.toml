@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "page_views"
+version = "0.1.0"
+description = "Webserver takehome project for Grow Therapy"
+authors = ["Pravan Kalaga"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.31.0"
+flask = "^3.0.0"
+markdown-to-json = "^2.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -9,7 +9,6 @@ readme = "README.md"
 python = "^3.11"
 requests = "^2.31.0"
 flask = "^3.0.0"
-markdown-to-json = "^2.1.0"
 
 
 [build-system]

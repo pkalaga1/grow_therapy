@@ -73,8 +73,6 @@ def validate_day(all_params, required, issues):
     month = all_params[QUERY_PARAM_MONTH]
     year = all_params[QUERY_PARAM_YEAR]
 
-    
-
     try:
         converted_day = int(start_day)
         converted_month = int(month)
@@ -99,11 +97,12 @@ def validate_day(all_params, required, issues):
         issue = 'day must be an integer'
         issues.append(issue)
     except TypeError:
-        issue = 'day can not be None'
-        issues.append(issue)
+        if all_params[QUERY_PARAM_TIME_WINDOW_SIZE] and all_params[QUERY_PARAM_TIME_WINDOW_SIZE] == QUERY_PARAM_WEEK_TIME_WINDOW:
+            issue = 'day can not be None for a week-based time window'
+            issues.append(issue)
 
 def validate_time_window(time_window, issues):
-    if time_window != QUERY_PARAM_WEEK_TIME_WINDOW or time_window != QUERY_PARAM_MONTH_TIME_WINDOW:
+    if time_window != QUERY_PARAM_WEEK_TIME_WINDOW and time_window != QUERY_PARAM_MONTH_TIME_WINDOW:
         issue = 'time window must be either a week or a month'
         issues.append(issue)
     if time_window == QUERY_PARAM_WEEK_TIME_WINDOW:

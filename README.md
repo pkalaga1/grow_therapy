@@ -5,7 +5,7 @@ Please see the api_spec.md for the api documentation (this would be a link if th
 
 <details>
 <summary> Startup the app </summary>
-I suggest using a python virtual environment for this project
+I suggest using a python virtual environment for this projects installation. I used
 <br><code>python3 -m venv myenv</code>
 <br><code>source ./myenv/bin/activate</code>
 <br> You will want to install all the dependencies in that virtual env using

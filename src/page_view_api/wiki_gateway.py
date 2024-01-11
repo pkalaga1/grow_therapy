@@ -131,7 +131,7 @@ class WikiGateway:
             'year' : year,
             'month': month,
             'time_window_size': time_window_size,
-            'start_day': None if time_window_size == QUERY_PARAM_MONTH_TIME_WINDOW else start_day,
+            'start_day': '01' if time_window_size == QUERY_PARAM_MONTH_TIME_WINDOW else start_day,
             'issues': issues,
             'page_num' : page_num,
             'page_size' : page_size,

@@ -13,8 +13,8 @@ I suggest using a python virtual environment for this project
 
 [if you dont have poetry, you should download it following these instructions](https://python-poetry.org/docs/#installation)
 <br> To start the webserver, run
-<br><code>python3 src/page_view_api/main.py</code>
-<br>From here, just follow the documentation!
+<br><code>python3 main.py</code>
+<br>From here, just follow the api documentation!
 
 </details>
 
@@ -40,13 +40,4 @@ There were several decisions i made that I will detail here
 <br> 6. I chose to interperet the month time window as the entire month given, rather than a month from the day given. This made more sense because i wouldnt be sure what exactly was the size of that time window. I did, however, do that way for the week because that made more sense than trying to determine which week a particular day fell in and computing that. 
 <br>7. I implemented the cache because the wikipedia api has a daily limit of 200 requests per user agent. This is not really an api that you can use at scale. I didnt want to duplicate calls in a session to make sure not to reach the 200 during a testing session. The only way around this would be changing the user agent every time you start a new session. The way to do that would be to use a config or helm file to change that value as necessary in case we wanted to do larger testing.
 <br>8. I chose to only implement en.wikipedia and all-projects. In a future build, i would like to include every single project wikipedia has for full coverage. As of now, for an MVP, i chose to go with only the 2 afore mentioned projects.
-</details>
-
-<details>
-<summary>Known Issue</summary>
-I am currently working on figuring out a fix. The unit tests do not work if the app can work. For some reason, poetry dependency manager is unable to make the src.page_view_api.* package visible to the application. It will only recognize page_view_api.*. On the other hand, the tests only recognize the code if they are all imported from src.page_view_api. These are at odds with each other so in order to run the app, i delete the src from the import statements and running the unit tests i add them back. I asked a question on the github 
-
-[here](https://github.com/python-poetry/poetry/issues/8868)
-
-but its not necessarily going to get resolved before you look at it. Just letting you know that it seems to be some environment issue. The current version of the code is built to run the app over the unit tests.
 </details>

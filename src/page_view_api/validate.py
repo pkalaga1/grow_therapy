@@ -1,4 +1,4 @@
-from page_view_api.constants import (
+from src.page_view_api.constants import (
     QUERY_PARAM_MONTH,
     QUERY_PARAM_PROJECT,
     QUERY_PARAM_YEAR,

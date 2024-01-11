@@ -69,9 +69,9 @@ def test_most_viewed_day_success():
      assert response.status_code == 200
      expected_response = {
           'date': '2019-10-08',
-           'name': 'Albert_Einstein',
-           'url': 'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/Albert_Einstein/daily/20191001/20191031',
-           'views': 22903
+          'name': 'Albert_Einstein',
+          'url': 'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/all-agents/Albert_Einstein/daily/20191001/20191031',
+          'views': 22903
      }
      assert expected_response == response.json()
 

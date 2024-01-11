@@ -32,7 +32,7 @@ STATUS_OK = 200
 STATUS_BAD_REQ = 400
 
 USER_AGENT_HEADER = 'User-Agent'
-USER_AGENT = 'pravan.kalaga@gmail.com'
+USER_AGENT = 'lakarpspam@gmail.com'
 
 WIKIMEDIA_PAGEVIEWS_PER_ARTICLE_URL = 'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/'
 WIKIMEDIA_TOP_PAGEVIEWS_URL = 'https://wikimedia.org/api/rest_v1/metrics/pageviews/top/'

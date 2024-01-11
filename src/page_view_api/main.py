@@ -1,9 +1,9 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from urllib.parse import urlparse
-from src.page_view_api.wiki_gateway import WikiGateway
-from src.page_view_api.validate import validate_params, validate_page_values
-from src.page_view_api.constants import (
+from page_view_api.wiki_gateway import WikiGateway
+from page_view_api.validate import validate_params, validate_page_values
+from page_view_api.constants import (
     API_ENDPOINT_HIGHEST_VIEWED_DAY_FOR_ARTICLE,
     API_ENDPOINT_TOP_VIEWED_ARTICLES_FOR_TIME_PERIOD,
     API_ENDPOINT_VIEW_COUNT_FOR_ARTICLE_FOR_TIME_WINDOW,

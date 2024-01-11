@@ -1,4 +1,4 @@
-from src.page_view_api.constants import (
+from page_view_api.constants import (
      ALL_PROJECTS,
      ALL_PROJECTS_NO_AGENTS,
      DAILY,
@@ -34,9 +34,9 @@ class WikiGateway:
                         total_counts[article_name] = 0
                     total_counts[article_name] += view_count
 
-    def call_wiki_api_for_top_articles_for_time_period(self, month:str, year: str, day: int, end_day: int, url:str, total_counts):
+    def call_wiki_api_for_top_articles_for_time_period(self, month:str, year: str, day: str, end_day: int, url:str, total_counts):
         headers = self.construct_headers()
-        curr_date = date(year=int(year), month=int(month), day=day)
+        curr_date = date(year=int(year), month=int(month), day=int(day))
         i = 1
         while i <= end_day:
             month_string = str(curr_date.month) if curr_date.month >= 10 else f'0' + str(curr_date.month)
@@ -79,9 +79,9 @@ class WikiGateway:
             total_counts_list, issues = self.cache[cache_key]
         else:
             end_day = 0
-            start_day = 1
             if time_window_size == QUERY_PARAM_MONTH_TIME_WINDOW:
                 end_day = 31 if int(month) in MONTHS_31_DAYS else 30
+                start_day = '1'
                 if int(month) == 2:
                     if int(year) % 4 == 0:
                         end_day = 29
@@ -89,7 +89,6 @@ class WikiGateway:
                         end_day = 28
             else:
                 end_day = 7
-                start_day = start_day
 
             wiki_response, status = self.call_wiki_api_for_top_articles_for_time_period(
                 month=month,
@@ -131,7 +130,7 @@ class WikiGateway:
             'year' : year,
             'month': month,
             'time_window_size': time_window_size,
-            'start_day': '01' if time_window_size == QUERY_PARAM_MONTH_TIME_WINDOW else start_day,
+            'start_day': '01' if time_window_size == QUERY_PARAM_MONTH_TIME_WINDOW else str(start_day),
             'issues': issues,
             'page_num' : page_num,
             'page_size' : page_size,

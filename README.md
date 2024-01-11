@@ -39,6 +39,7 @@ There were several decisions i made that I will detail here
 <br>5. I did not make test suites or automated tests. In general, there should be scripts to run the tests automatically during the building of the app, but i did not do that since i did not feel it necessary for the scope of the project. I would have automated testing and building in a production environment with code coverage as well to keep code quality.
 <br> 6. I chose to interperet the month time window as the entire month given, rather than a month from the day given. This made more sense because i wouldnt be sure what exactly was the size of that time window. I did, however, do that way for the week because that made more sense than trying to determine which week a particular day fell in and computing that. 
 <br>7. I implemented the cache because the wikipedia api has a daily limit of 200 requests per user agent. This is not really an api that you can use at scale. I didnt want to duplicate calls in a session to make sure not to reach the 200 during a testing session. The only way around this would be changing the user agent every time you start a new session. The way to do that would be to use a config or helm file to change that value as necessary in case we wanted to do larger testing.
+<br>8. I chose to only implement en.wikipedia and all-projects. In a future build, i would like to include every single project wikipedia has for full coverage. As of now, for an MVP, i chose to go with only the 2 afore mentioned projects.
 </details>
 
 <details>

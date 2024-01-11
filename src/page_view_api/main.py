@@ -1,11 +1,16 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 from urllib.parse import urlparse
-from wiki_gateway import WikiGateway
-from validate import validate_params
-from constants import (
+from src.page_view_api.wiki_gateway import WikiGateway
+from src.page_view_api.validate import validate_params, validate_page_values
+from src.page_view_api.constants import (
+    API_ENDPOINT_HIGHEST_VIEWED_DAY_FOR_ARTICLE,
+    API_ENDPOINT_TOP_VIEWED_ARTICLES_FOR_TIME_PERIOD,
+    API_ENDPOINT_VIEW_COUNT_FOR_ARTICLE_FOR_TIME_WINDOW,
     STATUS_OK, 
     STATUS_BAD_REQ,
+    PAGE_NUM_DEFAULT,
+    PAGE_SIZE_DEFAULT,
     QUERY_PARAM_DELIMITER,
     QUERY_PARAM_MONTH,
     QUERY_PARAM_PROJECT,
@@ -13,7 +18,9 @@ from constants import (
     QUERY_VALUE_DELIMITER,
     QUERY_PARAM_NAME,
     QUERY_PARAM_START_DAY,
-    QUERY_PARAM_TIME_WINDOW_SIZE
+    QUERY_PARAM_TIME_WINDOW_SIZE,
+    QUERY_PARAM_PAGE_SIZE,
+    QUERY_PARAM_PAGE_NUM,
 )
 hostName = "localhost"
 serverPort = 8080
@@ -27,13 +34,15 @@ class MyServer(BaseHTTPRequestHandler):
         response_json = None
         status_code = STATUS_OK
 
-        print(self.path)
-        if u.path == '/':
-            response_json, status_code = self.instructions()
-        elif u.path == '/day_article_most_viewed_in_month':
+        print(self.path)            
+        if u.path == API_ENDPOINT_HIGHEST_VIEWED_DAY_FOR_ARTICLE:
             response_json, status_code = self.do_get_day_of_most_view_for_article_in_given_month(query_params)
-        elif u.path == '/view_count_for_article_for_time_window':
-            response_json, status_code = self.do_get_get_view_count_for_article_for_time_window(query_params)
+        elif u.path == API_ENDPOINT_VIEW_COUNT_FOR_ARTICLE_FOR_TIME_WINDOW:
+            response_json, status_code = self.do_get_view_count_for_article_for_time_window(query_params)
+        elif u.path == API_ENDPOINT_TOP_VIEWED_ARTICLES_FOR_TIME_PERIOD:
+            response_json, status_code = self.do_get_most_viewed_articles_for_time_window(query_params)
+        else:
+            response_json, status_code = self.instructions()
 
         self.send_response(status_code)
         json_string = json.dumps(response_json, indent=2)
@@ -42,7 +51,32 @@ class MyServer(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(bytes(json_string, "utf-8"))
 
-    def do_get_get_view_count_for_article_for_time_window(self, query_params):
+    def do_get_most_viewed_articles_for_time_window(self, query_params):
+        issues = validate_params(query_params, day_required=True, name_required=False)
+        issues.extend(validate_page_values(query_params))
+        gateway = WikiGateway()
+
+        if len(issues) > 0:
+            issue_dict = {'issues': issues}
+            response_json = json.dumps(issue_dict)
+            status_code = STATUS_BAD_REQ
+        else:
+            page_num = PAGE_NUM_DEFAULT if not query_params[QUERY_PARAM_PAGE_NUM] else int(query_params[QUERY_PARAM_PAGE_NUM])
+            page_size = PAGE_SIZE_DEFAULT if not query_params[QUERY_PARAM_PAGE_SIZE] else int(query_params[QUERY_PARAM_PAGE_SIZE])
+
+            response_json, status_code = gateway.get_most_viewed_articles_for_time_window(
+                month=query_params[QUERY_PARAM_MONTH],
+                year=query_params[QUERY_PARAM_YEAR],
+                start_day=query_params[QUERY_PARAM_START_DAY],
+                time_window_size=query_params[QUERY_PARAM_TIME_WINDOW_SIZE],
+                projects=query_params[QUERY_PARAM_PROJECT],
+                page_num=page_num,
+                page_size=page_size
+            )
+
+        return response_json, status_code
+
+    def do_get_view_count_for_article_for_time_window(self, query_params):
         issues = validate_params(query_params, day_required=True)
         gateway = WikiGateway()
 
@@ -84,14 +118,16 @@ class MyServer(BaseHTTPRequestHandler):
         return instructions, STATUS_OK
     
 def parse_parameters(query_params):
-    params_list = query_params.split(QUERY_PARAM_DELIMITER)
+    params_list = query_params.split(QUERY_PARAM_DELIMITER) if query_params else []
     all_params = {
         QUERY_PARAM_NAME: None,
         QUERY_PARAM_MONTH: None,
         QUERY_PARAM_PROJECT : None,
         QUERY_PARAM_YEAR : None,
         QUERY_PARAM_START_DAY: None,
-        QUERY_PARAM_TIME_WINDOW_SIZE: None 
+        QUERY_PARAM_TIME_WINDOW_SIZE: None,
+        QUERY_PARAM_PAGE_NUM: None,
+        QUERY_PARAM_PAGE_SIZE: None 
     }
     for param in params_list:
         key, value = param.split(QUERY_VALUE_DELIMITER)

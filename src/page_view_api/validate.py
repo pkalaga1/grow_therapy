@@ -1,4 +1,4 @@
-from constants import (
+from src.page_view_api.constants import (
     QUERY_PARAM_MONTH,
     QUERY_PARAM_PROJECT,
     QUERY_PARAM_YEAR,
@@ -7,17 +7,41 @@ from constants import (
     QUERY_PARAM_TIME_WINDOW_SIZE,
     QUERY_PARAM_WEEK_TIME_WINDOW,
     QUERY_PARAM_MONTH_TIME_WINDOW,
+    QUERY_PARAM_PAGE_SIZE,
+    QUERY_PARAM_PAGE_NUM,
     MONTHS_31_DAYS
 )
 
-def validate_params(all_params, day_required=False):
+def validate_params(all_params, day_required=False, name_required=True):
     issues = []
     validate_month(all_params[QUERY_PARAM_MONTH], issues)
     validate_year(all_params[QUERY_PARAM_YEAR], issues)
     validate_project(all_params[QUERY_PARAM_PROJECT], issues)
-    validate_name(all_params[QUERY_PARAM_NAME], issues)
+    if name_required:
+        validate_name(all_params[QUERY_PARAM_NAME], issues)
 
     validate_day(all_params, day_required, issues)
+
+    return issues
+
+def validate_page_values(all_params):
+    page_num = all_params[QUERY_PARAM_PAGE_NUM]
+    page_size = all_params[QUERY_PARAM_PAGE_SIZE]
+
+    issues = []
+    if page_num != None:
+        try:
+            converted_page_num = int(page_num)
+        except ValueError:
+            issue = 'page num must be an integer'
+            issues.append(issue)
+    
+    if page_size != None:
+        try:
+            converted_page_size = int(page_size)
+        except ValueError:
+            issue = 'page size must be an integer'
+            issues.append(issue)
 
     return issues
 

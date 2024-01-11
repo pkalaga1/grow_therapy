@@ -399,3 +399,6 @@ FodyWeavers.xsd
 
 # Poetry
 poetry.lock
+
+# virtual env
+.venv

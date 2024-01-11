@@ -1,14 +1,15 @@
 [tool.poetry]
-name = "page_views"
+name = "page_view_api"
 version = "0.1.0"
 description = "Webserver takehome project for Grow Therapy"
 authors = ["Pravan Kalaga"]
 readme = "README.md"
+packages = [{include = "page_view_api", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 requests = "^2.31.0"
-flask = "^3.0.0"
+pytest = "^7.4.4"
 
 
 [build-system]

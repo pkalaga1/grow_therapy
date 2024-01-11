@@ -34,6 +34,7 @@ class MyServer(BaseHTTPRequestHandler):
         response_json = None
         status_code = STATUS_OK
 
+        # Figure out path and direct it to the proper code
         print(self.path)            
         if u.path == API_ENDPOINT_HIGHEST_VIEWED_DAY_FOR_ARTICLE:
             response_json, status_code = self.do_get_day_of_most_view_for_article_in_given_month(query_params)
@@ -44,6 +45,7 @@ class MyServer(BaseHTTPRequestHandler):
         else:
             response_json, status_code = self.instructions()
 
+        # Grab the response and write it to the website if you are using that instead of curl calls
         self.send_response(status_code)
         json_string = json.dumps(response_json, indent=2)
         self.path = '/example'
@@ -51,6 +53,12 @@ class MyServer(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(bytes(json_string, "utf-8"))
 
+    """
+    Gets a ranked list of the most viewed articles for a week or a month
+    Number of results can be modified by changing page num and page size
+    Required: month, year
+    Optional: time_window_size, start_day, page_size, page_num, project
+    """
     def do_get_most_viewed_articles_for_time_window(self, query_params):
         issues = validate_params(query_params, day_required=True, name_required=False)
         issues.extend(validate_page_values(query_params))
@@ -76,6 +84,11 @@ class MyServer(BaseHTTPRequestHandler):
 
         return response_json, status_code
 
+    """
+    Gets a total count of the views over a time window of a month or week for a specific article
+    Required: month, year, name
+    Optional: time_window_size, start_day
+    """
     def do_get_view_count_for_article_for_time_window(self, query_params):
         issues = validate_params(query_params, day_required=True)
         gateway = WikiGateway()
@@ -95,6 +108,10 @@ class MyServer(BaseHTTPRequestHandler):
             )
         return response_json, status_code
 
+    """
+    Finds the day a specific article was most viewed given a month
+    Required: month, year, name
+    """
     def do_get_day_of_most_view_for_article_in_given_month(self, query_params):
         issues = validate_params(query_params)
         gateway = WikiGateway()
@@ -116,7 +133,10 @@ class MyServer(BaseHTTPRequestHandler):
     def instructions(self):
         instructions = {'instructions': 'Please see our ReadME for help!'}
         return instructions, STATUS_OK
-    
+
+"""
+Create a dictionary of parameters that are expected for validation
+"""
 def parse_parameters(query_params):
     params_list = query_params.split(QUERY_PARAM_DELIMITER) if query_params else []
     all_params = {

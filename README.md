@@ -16,6 +16,8 @@ I suggest using a python virtual environment for this projects installation. I u
 <br><code>python3 main.py</code>
 <br>From here, just follow the api documentation!
 
+You can either navigate to localhost:8080 on your browser and add the query params into the url, or you can make curl calls. Both will work.
+
 </details>
 
 <details>
@@ -40,4 +42,5 @@ There were several decisions i made that I will detail here
 <br> 6. I chose to interperet the month time window as the entire month given, rather than a month from the day given. This made more sense because i wouldnt be sure what exactly was the size of that time window. I did, however, do that way for the week because that made more sense than trying to determine which week a particular day fell in and computing that. 
 <br>7. I implemented the cache because the wikipedia api has a daily limit of 200 requests per user agent. This is not really an api that you can use at scale. I didnt want to duplicate calls in a session to make sure not to reach the 200 during a testing session. The only way around this would be changing the user agent every time you start a new session. The way to do that would be to use a config or helm file to change that value as necessary in case we wanted to do larger testing.
 <br>8. I chose to only implement en.wikipedia and all-projects. In a future build, i would like to include every single project wikipedia has for full coverage. As of now, for an MVP, i chose to go with only the 2 afore mentioned projects.
+<br>9. I did not create a helpers file. For future code cleanliness i believe that would be the best way to add the helping methods, but due to the scope being limited i chose not to do that for the sake of time.
 </details>

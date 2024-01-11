@@ -21,6 +21,13 @@ import requests
 class WikiGateway:
     cache = {}
 
+    """
+    Construct a dictionary that tracks the total number of views for each article seen
+    Over a time window
+
+    res_json is a response from the top viewed articles wikipedia api
+    total counts is the running dictionary
+    """
     def map_function(self, res_json, total_counts):
         for attribute in res_json:
             if attribute == 'items': # In case there are other attributes in the response dict (there shouldnt be)
@@ -34,6 +41,12 @@ class WikiGateway:
                         total_counts[article_name] = 0
                     total_counts[article_name] += view_count
 
+    """
+    Calls the wikipedia api in a loop from day to end day
+    Uses day, month, and year to construct a date and then do date math to get consecutive days
+
+    If a call fails, it returns the failing json from wikipedia
+    """
     def call_wiki_api_for_top_articles_for_time_period(self, month:str, year: str, day: str, end_day: int, url:str, total_counts):
         headers = self.construct_headers()
         curr_date = date(year=int(year), month=int(month), day=int(day))
@@ -53,6 +66,19 @@ class WikiGateway:
             i += 1
         return None, STATUS_OK
 
+    """
+    Given a time window, return the most viewed articles for that time window ranked
+    Uses a cache to determine if we have already seen the result of this call so we 
+    dont make excessive calls to the wikipedia api
+
+    month
+    year
+    time_window_size Default: month
+    start_day
+    projects Default: all-projects
+    page_num
+    page_size
+    """
     def get_most_viewed_articles_for_time_window(
             self,
             month: str,
@@ -64,6 +90,7 @@ class WikiGateway:
             page_size: int = 10,
         ):
         
+        # Constructs the URL using constants
         url = WIKIMEDIA_TOP_PAGEVIEWS_URL
         if projects == 'english':
             url += ENGLISH_PROJECTS_NO_AGENTS
@@ -75,10 +102,12 @@ class WikiGateway:
         issues = []
         cache_key = (month, year, time_window_size, projects, start_day)
 
+        # caching check
         if cache_key in self.cache:
             total_counts_list, issues = self.cache[cache_key]
         else:
             end_day = 0
+            # Choose end day based on the month if its a month window
             if time_window_size == QUERY_PARAM_MONTH_TIME_WINDOW:
                 end_day = 31 if int(month) in MONTHS_31_DAYS else 30
                 start_day = '1'
@@ -88,6 +117,7 @@ class WikiGateway:
                     else:
                         end_day = 28
             else:
+                # end day is 7 days later in the event its a week window
                 end_day = 7
 
             wiki_response, status = self.call_wiki_api_for_top_articles_for_time_period(
@@ -102,11 +132,13 @@ class WikiGateway:
                 return wiki_response, status
             
             total_counts_list = sorted(total_counts.items(), key=lambda x:x[1], reverse=True)
+            # store response in the cache
             self.cache[cache_key] = (total_counts_list, issues)
 
         first_item_on_page = 0 + page_num * page_size
         last_item_on_page = first_item_on_page + page_size
 
+        # Check if the pages are valid for the size of the response and handle accordingly
         if first_item_on_page > len(total_counts_list):
             failed_response = {
                 'issues' : ['There are no more items on this call'] 
@@ -139,6 +171,16 @@ class WikiGateway:
 
         return ranked_response, STATUS_OK
 
+    """
+    Total view count for an article for a time window
+
+    name
+    month
+    year
+    time_window_size Default: month
+    start_day
+    projects Default: all-projects
+    """
     def get_view_count_for_article_for_time_window(
             self, 
             name: str, 
@@ -148,6 +190,7 @@ class WikiGateway:
             start_day: str = None, 
             projects:str = None
         ):
+        # construct URL using constants
         headers = self.construct_headers()
         url = WIKIMEDIA_PAGEVIEWS_PER_ARTICLE_URL
         if projects == 'english':
@@ -156,9 +199,12 @@ class WikiGateway:
             url += ALL_PROJECTS
 
         url +=  name + '/' + DAILY
+
+        # Create the start date as a string for the URL purposes
         start_date_str = ''
         start_date = date(year=int(year), month=int(month), day=1)
         start_month_string = f'{start_date.month}' if int(start_date.month) >= 10 else f'0{start_date.month}'
+        
         if time_window_size == QUERY_PARAM_MONTH_TIME_WINDOW:
             # Create the start date string for the response
             start_date_str = str(start_date.year) + start_month_string + '01'
@@ -169,6 +215,7 @@ class WikiGateway:
         
         total_count_response = {}
         cache_key = (name, month, year, time_window_size, start_day, projects)
+        # Cached result check
         if cache_key in self.cache:
             total_count_response = self.cache[cache_key]
         else:
@@ -177,6 +224,7 @@ class WikiGateway:
             if res.status_code != STATUS_OK:
                 return res_json, res.status_code
         
+            # Aggregate all the views for an article
             total_count = 0
             for attribute in res_json:
                 if attribute == 'items': # In case there are other attributes in the response dict (there shouldnt be)
@@ -195,6 +243,14 @@ class WikiGateway:
         return total_count_response, 200
 
 
+    """
+    Find the most viewed day in a month for an article
+
+    name
+    month
+    year
+    projects Default: all-projects
+    """
     def day_of_most_views_for_article_in_given_month(self, name: str, month: str, year: str, projects:str = None):
         headers = self.construct_headers()
         url = WIKIMEDIA_PAGEVIEWS_PER_ARTICLE_URL
@@ -238,11 +294,20 @@ class WikiGateway:
         return most_viewed_day, STATUS_OK
     
 
+    """
+    Construct the api header call.
+    Moved to helper to reduce repitition
+    """
     def construct_headers(self):
         headers = {}
         headers[USER_AGENT_HEADER] = USER_AGENT
         return headers
     
+    """
+    Week string is in the form 20150101.
+    We convert the day and month to integers to check if they are greater than 10
+    If not we add a 0 in front of them to make the url work out as expected on wikis side
+    """
     def add_week_string(self, month: str, year: str, start_day: str, url: str):
         converted_month = int(month)
         
@@ -263,6 +328,11 @@ class WikiGateway:
         
         return url, start_day_string
 
+    """
+    Month string is for month long time windows
+    does the same as week string but also adds the day as 1 or 28,29,30, or 31
+    Depending on what month it is and if its a leap year february
+    """
     def add_month_string(self, month: str, year: str, url: str):
         converted_month = int(month)
         month_string = f'{converted_month}' if converted_month >= 10 else f'0{converted_month}'

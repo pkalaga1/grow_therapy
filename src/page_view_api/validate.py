@@ -12,6 +12,9 @@ from src.page_view_api.constants import (
     MONTHS_31_DAYS
 )
 
+"""
+Validate all parameters
+"""
 def validate_params(all_params, day_required=False, name_required=True):
     issues = []
     validate_month(all_params[QUERY_PARAM_MONTH], issues)
@@ -24,6 +27,9 @@ def validate_params(all_params, day_required=False, name_required=True):
 
     return issues
 
+"""
+Checks that page values are integers
+"""
 def validate_page_values(all_params):
     page_num = all_params[QUERY_PARAM_PAGE_NUM]
     page_size = all_params[QUERY_PARAM_PAGE_SIZE]
@@ -45,6 +51,9 @@ def validate_page_values(all_params):
 
     return issues
 
+"""
+Checks that month is not none and is an integer
+"""
 def validate_month(month, issues):
     try:
         converted_month = int(month)
@@ -58,6 +67,11 @@ def validate_month(month, issues):
         issue = 'month can not be none'
         issues.append(issue)
 
+"""
+Checks that year is not none and is an integer
+Also checks that the year is not earlier than 2001 
+since wikipedia was created then and wont have page view data before that
+"""
 def validate_year(year, issues):
     year_as_str = str(year)
     if len(year_as_str) != 4:
@@ -75,16 +89,25 @@ def validate_year(year, issues):
         issue = 'year can not be None'
         issues.append(issue)
 
+"""
+Checks if project is either english or all. We do not support other projects
+"""
 def validate_project(project, issues):
     if project != None and project != 'english' and project != 'all':
         issue = 'This api only supports all or english. Please use one of those'
         issues.append(issue)
 
+"""
+Checks that name is not None
+"""
 def validate_name(name, issues):
     if name == None:
         issue = 'name can not be None'
         issues.append(issue)
 
+"""
+Checks that start day is present if the time window is a week. 
+"""
 def validate_day(all_params, required, issues):
     if not required:
         return
@@ -125,6 +148,12 @@ def validate_day(all_params, required, issues):
             issue = 'day can not be None for a week-based time window'
             issues.append(issue)
 
+"""
+Checks that time window is week or month
+Returns True if it is a window of a week and False if its a month
+
+This is to help calculations on if we need to check the day's validity
+"""
 def validate_time_window(time_window, issues):
     if time_window != QUERY_PARAM_WEEK_TIME_WINDOW and time_window != QUERY_PARAM_MONTH_TIME_WINDOW:
         issue = 'time window must be either a week or a month'

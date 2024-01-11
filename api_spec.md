@@ -96,10 +96,9 @@
 
 > | name              |  type     | data type      | description                         |
 > |-------------------|-----------|----------------|-------------------------------------|
-> | `name` |  required | str   | The name of the article you are looking for        |
 > | `month` |  required | int   | The month that you are checking for the max views       |
 > | `year` |  required | int   | The year that you are checking for the max views       |
-> | `project` |  optional | str   | limit the scope of the search to specific wikipedia zones. currently supports all or english      |
+> | `project` |  optional | str   | Default: all; limit the scope of the search to specific wikipedia zones. currently supports all or english      |
 > | `time_window_size` |  optional | str   | default: month ; Must be either month or week. Determines size of window we look at for aggregating view count     |
 > | `start_day` |  optional | str   | required if the time_window_size is week. Determines the start day of the window. It is default to day 1 if time_window_size is month     |
 > | `page_size` |  optional | int   | Default: 10; Determines how many results you get back     |
